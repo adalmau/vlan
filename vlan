@@ -1,4 +1,7 @@
 #!/bin/bash
+#Autor: Anton Dalmau
+
+
 arrIfaces=()
 
 function getIfaces() {
@@ -22,7 +25,7 @@ clear
 
 tput setaf 119
 echo "-------------------------------------------------"
-echo "Configuració de VLANs per la interfície $iface"
+echo "             CONFIGURACIÓ DE VLANs               "
 echo "-------------------------------------------------"
 printf "\nSobre quina interfície vols treballar?\n"
 getIfaces
