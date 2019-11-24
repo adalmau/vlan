@@ -2,7 +2,7 @@
 arrIfaces=()
 
 function getIfaces() {
-    for iface in $(ifconfig | cut -d ' ' -f1| tr ':' '\n' | awk NF)
+    for iface in $(p a | cut -d ' ' -f2| cut -d '@' -f1 | tr ':' '\n' | awk NF)
     do
         arrIfaces+=("$iface")
     done
