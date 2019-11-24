@@ -1,0 +1,69 @@
+#!/bin/bash
+arrIfaces=()
+
+function getIfaces() {
+    for iface in $(ifconfig | cut -d ' ' -f1| tr ':' '\n' | awk NF)
+    do
+        arrIfaces+=("$iface")
+    done
+}
+
+function showIfaces() {
+    count=0
+    for i in "${arrIfaces[@]}"
+    do 
+       echo "$count. $i"
+       (( count++ ))
+    done
+}
+
+
+clear
+
+tput setaf 119
+echo "-------------------------------------------------"
+echo "Configuració de VLANs per la interfície $iface"
+echo "-------------------------------------------------"
+printf "\nSobre quina interfície vols treballar?\n"
+getIfaces
+showIfaces
+tput sgr0
+read ifaceNumber
+tput setaf 119
+iface="${arrIfaces[ifaceNumber]}"
+echo "Quina acció vols? 'add' / 'del'"
+tput sgr0
+read action
+
+if [[ $action == "add" || $action == "a" ]]
+then
+    tput setaf 119
+    echo "ID de la VLAN:"
+    tput sgr0
+    read idvlan
+    #sudo vconfig add $iface $idvlan
+    sudo ip l add link $iface name $iface.$idvlan type vlan id $idvlan
+    tput setaf 119
+    echo "Vols DHCP? [s/n]"
+    tput sgr0
+    read dhcp
+    if [[ $dhcp == "s" ]]
+    then
+        sudo dhclient $iface.$idvlan
+    fi
+    sudo ip link set $iface up
+    sudo ip link set $iface.$idvlan up
+    notify-send "VLAN $idvlan afegida"
+elif [[ $action == "del" || $action == "d" ]]
+then
+    #sudo vconfig rem $iface.$idvlan
+    sudo ip link delete $iface
+    notify-send "VLAN $idvlan eliminada"
+else
+    tput setaf 196
+    echo "ERROR: acció incorrecta."
+    tput sgr0
+fi
+
+ip -c a
+route -n
