@@ -1,7 +1,6 @@
 #!/bin/bash
 #Autor: Anton Dalmau
 
-
 arrIfaces=()
 
 function getIfaces() {
@@ -14,7 +13,7 @@ function getIfaces() {
 function showIfaces() {
     count=0
     for i in "${arrIfaces[@]}"
-    do 
+    do
        echo "$count. $i"
        (( count++ ))
     done
@@ -25,7 +24,7 @@ clear
 
 tput setaf 119
 echo "-------------------------------------------------"
-echo "             CONFIGURACIÓ DE VLANs               "
+echo "            CONFIGURACIÓ DE VLANs                "
 echo "-------------------------------------------------"
 printf "\nSobre quina interfície vols treballar?\n"
 getIfaces
@@ -34,7 +33,7 @@ tput sgr0
 read ifaceNumber
 tput setaf 119
 iface="${arrIfaces[ifaceNumber]}"
-echo "Quina acció vols? 'add' / 'del'"
+echo "Quina acció vols? [add] [del] [up] [down]"
 tput sgr0
 read action
 
@@ -53,6 +52,12 @@ then
     if [[ $dhcp == "s" ]]
     then
         sudo dhclient $iface.$idvlan
+    else
+        tput setaf 119
+        echo "Escriu la IP:"
+        tput sgr0
+        read ip
+        sudo ip addr add $ip dev $iface.$idvlan
     fi
     sudo ip link set $iface up
     sudo ip link set $iface.$idvlan up
@@ -62,6 +67,14 @@ then
     #sudo vconfig rem $iface.$idvlan
     sudo ip link delete $iface
     notify-send "VLAN $idvlan eliminada"
+elif [[ $action == "up" || $action == "u" ]]
+then
+    sudo ip link set $iface up
+    notify-send "$iface up"
+elif [[ $action == "down" || $action == "do" ]]
+then
+    sudo ip link set $iface down
+    notify-send "$iface down"
 else
     tput setaf 196
     echo "ERROR: acció incorrecta."
